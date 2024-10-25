@@ -25,7 +25,36 @@ const Dashboard = () => {
     { id: 2, name: "Equipe B" },
   ]);
 
-  const [orders] = useState<ServiceOrder[]>([]);
+  const [orders] = useState<ServiceOrder[]>([
+    {
+      id: 1,
+      clientName: "João Silva",
+      phone: "11999887766",
+      isWhatsApp: true,
+      address: "Rua das Flores, 123 - Centro",
+      serviceType: "installation",
+      status: "open",
+      teamId: 1,
+      materials: ["Câmera IP", "DVR", "Cabo"],
+      observations: "",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: 2,
+      clientName: "Maria Santos",
+      phone: "11988776655",
+      isWhatsApp: true,
+      address: "Av. Principal, 456 - Jardim América",
+      serviceType: "repair",
+      status: "waiting_parts",
+      teamId: 2,
+      materials: ["Fonte 12V", "Conector BNC"],
+      observations: "Cliente relatou que câmera não está funcionando",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  ]);
 
   const statusData = [
     { name: "Abertas", value: orders.filter(o => o.status === "open").length },
@@ -110,6 +139,16 @@ const Dashboard = () => {
                     <p className="text-sm text-gray-600">
                       Tipo: {order.serviceType} | Status: {order.status}
                     </p>
+                    {order.materials && order.materials.length > 0 && (
+                      <p className="text-sm text-gray-600">
+                        Materiais: {order.materials.join(", ")}
+                      </p>
+                    )}
+                    {order.observations && (
+                      <p className="text-sm text-gray-600">
+                        Observações: {order.observations}
+                      </p>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     {order.isWhatsApp && (
