@@ -2,9 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { LogOut, Plus, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const { logout, user } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -12,7 +14,7 @@ const Dashboard = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Ordens de Serviço</h1>
           <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={() => window.location.href = "/settings"}>
+            <Button variant="outline" onClick={() => navigate("/settings")}>
               <Settings className="w-4 h-4 mr-2" />
               Configurações
             </Button>
