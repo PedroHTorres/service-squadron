@@ -1,12 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-interface User {
-  id: string;
-  name: string;
-  role: "admin" | "team";
-  teamId?: string;
-}
+import { User } from "@/types";
 
 interface AuthContextType {
   user: User | null;
@@ -28,12 +22,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (username: string, password: string) => {
-    // Simular autenticação
     if (username === "admin" && password === "admin") {
       const userData: User = {
         id: "1",
         name: "Administrador",
         role: "admin",
+      };
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+      navigate("/dashboard");
+    } else if (username === "team1" && password === "team1") {
+      const userData: User = {
+        id: "2",
+        name: "Equipe 1",
+        role: "team",
+        teamId: 1,
       };
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));

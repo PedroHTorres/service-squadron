@@ -1,12 +1,50 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut, Plus, Settings } from "lucide-react";
+import { LogOut, Plus, Settings, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { ServiceOrder, ServiceStatus, Team } from "@/types";
+import ServiceOrderForm from "@/components/ServiceOrderForm";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const Dashboard = () => {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
+  const [showNewOrderForm, setShowNewOrderForm] = useState(false);
+  const [teams] = useState<Team[]>([
+    { id: 1, name: "Equipe A" },
+    { id: 2, name: "Equipe B" },
+  ]);
+
+  const [orders] = useState<ServiceOrder[]>([]);
+
+  const statusData = [
+    { name: "Abertas", value: orders.filter(o => o.status === "open").length },
+    { name: "Em Andamento", value: orders.filter(o => o.status === "in_progress").length },
+    { name: "Aguardando Peças", value: orders.filter(o => o.status === "waiting_parts").length },
+    { name: "Cliente Ausente", value: orders.filter(o => o.status === "client_absent").length },
+    { name: "Problemas Pós-visita", value: orders.filter(o => o.status === "post_visit_issues").length },
+  ];
+
+  const handleCreateOrder = (data: Partial<ServiceOrder>) => {
+    // Aqui você implementaria a lógica para salvar a ordem
+    console.log("Nova ordem:", data);
+    setShowNewOrderForm(false);
+  };
+
+  const handleWhatsAppClick = (phone: string) => {
+    const formattedPhone = phone.replace(/\D/g, "");
+    window.open(`https://wa.me/${formattedPhone}`, "_blank");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -31,31 +69,62 @@ const Dashboard = () => {
           <h2 className="text-xl font-semibold text-gray-800">
             Bem-vindo, {user?.name}
           </h2>
-          <Button>
+          <Button onClick={() => setShowNewOrderForm(!showNewOrderForm)}>
             <Plus className="w-4 h-4 mr-2" />
             Nova Ordem de Serviço
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="p-6">
-            <h3 className="font-medium text-gray-600 mb-2">Ordens Abertas</h3>
-            <p className="text-3xl font-bold text-primary">12</p>
-          </Card>
-          <Card className="p-6">
-            <h3 className="font-medium text-gray-600 mb-2">Em Andamento</h3>
-            <p className="text-3xl font-bold text-secondary">5</p>
-          </Card>
-          <Card className="p-6">
-            <h3 className="font-medium text-gray-600 mb-2">Concluídas Hoje</h3>
-            <p className="text-3xl font-bold text-gray-900">8</p>
-          </Card>
+        {showNewOrderForm && (
+          <div className="mb-8">
+            <ServiceOrderForm teams={teams} onSubmit={handleCreateOrder} />
+          </div>
+        )}
+
+        <div className="mb-8 bg-white p-4 rounded-lg shadow">
+          <h3 className="text-lg font-medium mb-4">Status das Ordens</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={statusData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" fill="#0066FF" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium mb-4">Ordens Recentes</h3>
-          <div className="text-gray-600 text-center py-8">
-            Carregando ordens de serviço...
+        <div className="bg-white rounded-lg shadow">
+          <div className="p-4 border-b">
+            <h3 className="text-lg font-medium">Ordens de Serviço</h3>
+          </div>
+          <div className="divide-y">
+            {orders.map((order) => (
+              <div key={order.id} className="p-4 hover:bg-gray-50">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="font-medium">{order.clientName}</h4>
+                    <p className="text-sm text-gray-600">{order.address}</p>
+                    <p className="text-sm text-gray-600">
+                      Tipo: {order.serviceType} | Status: {order.status}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    {order.isWhatsApp && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleWhatsAppClick(order.phone)}
+                      >
+                        <Phone className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </main>
