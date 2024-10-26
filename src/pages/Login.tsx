@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { User } from "lucide-react";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -33,9 +32,11 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md p-8 animate-fade-in">
         <div className="flex flex-col items-center mb-6">
-          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4">
-            <User className="w-8 h-8 text-white" />
-          </div>
+          <img 
+            src="/security-logo.png" 
+            alt="Security Logo" 
+            className="h-16 mb-4"
+          />
           <h1 className="text-2xl font-bold text-gray-900">Login</h1>
           <p className="text-gray-600">Sistema de Ordens de Serviço</p>
         </div>
