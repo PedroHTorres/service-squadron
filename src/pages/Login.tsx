@@ -33,9 +33,9 @@ const Login = () => {
       <Card className="w-full max-w-md p-8 animate-fade-in">
         <div className="flex flex-col items-center mb-6">
           <img 
-            src="/security-logo.png" 
+            src="https://images.unsplash.com/photo-1518770660439-4636190af475" 
             alt="Security Logo" 
-            className="h-16 mb-4"
+            className="h-16 w-16 object-cover rounded-full mb-4"
           />
           <h1 className="text-2xl font-bold text-gray-900">Login</h1>
           <p className="text-gray-600">Sistema de Ordens de Serviço</p>
