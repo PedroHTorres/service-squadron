@@ -53,19 +53,41 @@ const Dashboard = () => {
       observations: "Cliente relatou que câmera não está funcionando",
       createdAt: new Date(),
       updatedAt: new Date()
+    },
+    {
+      id: 3,
+      clientName: "Carlos Oliveira",
+      phone: "11977665544",
+      isWhatsApp: true,
+      address: "Rua Secundária, 789 - Vila Nova",
+      serviceType: "installation",
+      status: "open",
+      teamId: undefined, // Ordem bônus - sem equipe atribuída
+      materials: ["Câmera IP", "Cabo"],
+      observations: "Instalação simples",
+      createdAt: new Date(),
+      updatedAt: new Date()
     }
   ]);
 
+  // Filtra as ordens baseado no tipo de usuário e equipe
+  const filteredOrders = orders.filter(order => {
+    if (user?.role === "admin") {
+      return true; // Admin vê todas as ordens
+    }
+    // Equipe vê suas próprias ordens + ordens sem equipe atribuída
+    return order.teamId === user?.teamId || order.teamId === undefined;
+  });
+
   const statusData = [
-    { name: "Abertas", value: orders.filter(o => o.status === "open").length },
-    { name: "Em Andamento", value: orders.filter(o => o.status === "in_progress").length },
-    { name: "Aguardando Peças", value: orders.filter(o => o.status === "waiting_parts").length },
-    { name: "Cliente Ausente", value: orders.filter(o => o.status === "client_absent").length },
-    { name: "Problemas Pós-visita", value: orders.filter(o => o.status === "post_visit_issues").length },
+    { name: "Abertas", value: filteredOrders.filter(o => o.status === "open").length },
+    { name: "Em Andamento", value: filteredOrders.filter(o => o.status === "in_progress").length },
+    { name: "Aguardando Peças", value: filteredOrders.filter(o => o.status === "waiting_parts").length },
+    { name: "Cliente Ausente", value: filteredOrders.filter(o => o.status === "client_absent").length },
+    { name: "Problemas Pós-visita", value: filteredOrders.filter(o => o.status === "post_visit_issues").length },
   ];
 
   const handleCreateOrder = (data: Partial<ServiceOrder>) => {
-    // Aqui você implementaria a lógica para salvar a ordem
     console.log("Nova ordem:", data);
     setShowNewOrderForm(false);
   };
@@ -81,10 +103,12 @@ const Dashboard = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Ordens de Serviço</h1>
           <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={() => navigate("/settings")}>
-              <Settings className="w-4 h-4 mr-2" />
-              Configurações
-            </Button>
+            {user?.role === "admin" && (
+              <Button variant="outline" onClick={() => navigate("/settings")}>
+                <Settings className="w-4 h-4 mr-2" />
+                Configurações
+              </Button>
+            )}
             <Button variant="ghost" onClick={logout}>
               <LogOut className="w-4 h-4 mr-2" />
               Sair
@@ -98,13 +122,15 @@ const Dashboard = () => {
           <h2 className="text-xl font-semibold text-gray-800">
             Bem-vindo, {user?.name}
           </h2>
-          <Button onClick={() => setShowNewOrderForm(!showNewOrderForm)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Nova Ordem de Serviço
-          </Button>
+          {user?.role === "admin" && (
+            <Button onClick={() => setShowNewOrderForm(!showNewOrderForm)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Ordem de Serviço
+            </Button>
+          )}
         </div>
 
-        {showNewOrderForm && (
+        {showNewOrderForm && user?.role === "admin" && (
           <div className="mb-8">
             <ServiceOrderForm teams={teams} onSubmit={handleCreateOrder} />
           </div>
@@ -130,7 +156,7 @@ const Dashboard = () => {
             <h3 className="text-lg font-medium">Ordens de Serviço</h3>
           </div>
           <div className="divide-y">
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <div key={order.id} className="p-4 hover:bg-gray-50">
                 <div className="flex justify-between items-start">
                   <div>
@@ -139,6 +165,11 @@ const Dashboard = () => {
                     <p className="text-sm text-gray-600">
                       Tipo: {order.serviceType} | Status: {order.status}
                     </p>
+                    {order.teamId === undefined && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Ordem Bônus Disponível
+                      </span>
+                    )}
                     {order.materials && order.materials.length > 0 && (
                       <p className="text-sm text-gray-600">
                         Materiais: {order.materials.join(", ")}
